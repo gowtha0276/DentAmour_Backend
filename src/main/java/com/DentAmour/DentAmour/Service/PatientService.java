@@ -1,9 +1,13 @@
 package com.DentAmour.DentAmour.Service;
 
 import com.DentAmour.DentAmour.Helper.Utility;
+import com.DentAmour.DentAmour.Interface.IPatientService;
 import com.DentAmour.DentAmour.Models.Patient;
 import com.DentAmour.DentAmour.Repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -11,11 +15,12 @@ import java.util.List;
 import java.util.Random;
 
 @Service
-public class PatientService {
+public class PatientService implements IPatientService {
     @Autowired
     PatientRepository patientRepository;
     @Autowired
     Utility utility;
+
     public int generateRandomNumber() {
         int uniqueId = utility.getRandom();
         Patient patient = patientRepository.findById(Integer.toString(uniqueId)).orElse(null);
@@ -23,10 +28,8 @@ public class PatientService {
             return generateRandomNumber();
         return uniqueId;
     }
-    public List<Patient> getPatient()
-    {
-        return patientRepository.findAll();
-    }
+
+    @Override
     public Patient createPatient(Patient patient)
     {
         patient.setAge(utility.calculateAge(patient.getDateOfBirth()));
@@ -34,7 +37,8 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
-    public void updatePatient(String id,Patient patient) {
+    @Override
+    public void updatePatientById(String id,Patient patient) {
 
         Patient pat= patientRepository.findById(id).orElse(null);
         if (pat != null) {
@@ -44,9 +48,32 @@ public class PatientService {
         }
     }
 
-    public void deletePatient(String id)
-    {
-        patientRepository.deleteById(id);
+    @Override
+    public Patient findPatientByEmailId(String mail) {
+        return patientRepository.findBymail(mail);
     }
 
+    @Override
+    public Patient findPatientByRegistrationId(String registrationId) {
+        return patientRepository.findByregistrationID(registrationId);
+    }
+
+    @Override
+    public List<Patient> findAllPatients() {
+            return patientRepository.findAll();
+    }
+
+    @Override
+    public void deletePatientByRegistrationId(String registrationId) {
+        patientRepository.deleteByregistrationID(registrationId);
+    }
+
+    @Override
+    public Patient findPatientByPhoneOrRegistrationId(String param)
+    {
+        Patient p=patientRepository.findByphone(param);
+        if(p==null)
+            p=patientRepository.findByregistrationID(param);
+        return p;
+    }
 }

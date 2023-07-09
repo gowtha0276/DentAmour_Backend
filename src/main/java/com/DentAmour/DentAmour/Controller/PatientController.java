@@ -1,8 +1,11 @@
 package com.DentAmour.DentAmour.Controller;
 
+import com.DentAmour.DentAmour.Interface.IPatientService;
 import com.DentAmour.DentAmour.Models.Patient;
 import com.DentAmour.DentAmour.Service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,26 +14,46 @@ import java.util.List;
 @RequestMapping("/api/patient")
 public class PatientController {
     @Autowired
-    PatientService patientService;
+    IPatientService patientService;
+
     @PostMapping("/create")
     public Patient createPatient(@RequestBody Patient patient)
     {
         return patientService.createPatient(patient);
     }
-    @GetMapping("/get")
-    public List<Patient> getPatient()
+
+    @GetMapping("/getAllPatients")
+    public List<Patient> getPatients()
     {
-        return patientService.getPatient();
+        return patientService.findAllPatients();
     }
 
-    @PutMapping("/update")
-    public void updatePatient(@RequestParam("id") String param1,@RequestBody Patient patient)  {
-         patientService.updatePatient(param1,patient);
+    @PutMapping("/updatePatientById")
+    public void updatePatient(@RequestParam("id") String id,@RequestBody Patient patient)  {
+         patientService.updatePatientById(id,patient);
     }
 
-    @DeleteMapping("/delete")
-    public void deletePatient(@RequestParam("id") String param1)  {
-        patientService.deletePatient(param1);
+    @DeleteMapping("/deletePatientByRegistrationId")
+    public void deletePatient(@RequestParam("id") String id)  {
+        patientService.deletePatientByRegistrationId(id);
     }
 
+    @GetMapping("/getByRegistrationId")
+    public Patient getPatientByRegistrationId(@RequestParam("id") String id)
+    {
+        return patientService.findPatientByRegistrationId(id);
+    }
+
+    @GetMapping("/getByEmailId")
+    public Patient getPatientByEmailId(@RequestParam("id") String id)
+    {
+        return patientService.findPatientByEmailId(id);
+    }
+
+    @GetMapping("/getByPhoneOrRegistrationId")
+    public ResponseEntity getPatientByPhoneOrRegistrationId(@RequestParam("searchInput") String searchInput)
+    {
+        Patient p=patientService.findPatientByPhoneOrRegistrationId(searchInput);
+        return new ResponseEntity(p,p==null ? HttpStatus.NOT_FOUND: HttpStatus.OK);
+    }
 }

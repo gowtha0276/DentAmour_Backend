@@ -5,6 +5,8 @@ import com.DentAmour.DentAmour.Models.Treatment;
 import com.DentAmour.DentAmour.Service.PatientService;
 import com.DentAmour.DentAmour.Service.TreatmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,10 +21,10 @@ public class TreatmentController {
     {
         return treatmentService.createTreatment(treatment);
     }
-    @GetMapping("/get")
-    public List<Treatment> getTreatment()
+    @GetMapping("/getAllTreatments")
+    public ResponseEntity getTreatment()
     {
-        return treatmentService.getTreatment();
+        return new ResponseEntity(treatmentService.getTreatment(), HttpStatus.OK);
     }
 
     @PutMapping("/update")
